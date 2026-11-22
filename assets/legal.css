@@ -1,0 +1,79 @@
+/* Shared legal-page styles. Tokens from adeptvue-app/src/theme/colors.ts */
+:root {
+  --navy: #0E1A2B;
+  --teal: #0F766E;
+  --bg: #F4F6F8;
+  --surface: #FFFFFF;
+  --ink: #0E1A2B;
+  --muted: #475569;
+  --line: #E5E7EB;
+  --accent: #0F766E;
+  --accent-hover: #0C5F59;
+  --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --navy: #0B1C2D;
+    --teal: #009DA3;
+    --bg: #0B1220;
+    --surface: #131C2E;
+    --ink: #F1F5F9;
+    --muted: #CBD5E1;
+    --line: #2A3A55;
+    --accent: #009DA3;
+    --accent-hover: #4DB8BC;
+  }
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--sans);
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.6;
+  font-size: 1.0625rem;
+}
+a { color: var(--accent); }
+a:hover { color: var(--accent-hover); }
+:focus-visible { outline: 3px solid var(--teal); outline-offset: 3px; }
+.site-top {
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+}
+.site-top .wrap {
+  width: min(900px, calc(100% - 40px));
+  margin: 0 auto;
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+}
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: var(--ink);
+  text-decoration: none;
+}
+.brand:hover { color: var(--ink); }
+.brand-logo { display: block; height: 32px; width: auto; }
+.brand-logo-dark { display: none; }
+@media (prefers-color-scheme: dark) {
+  .brand-logo-light { display: none; }
+  .brand-logo-dark { display: block; }
+}
+main.legal {
+  width: min(900px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 40px 0 64px;
+}
+main.legal h1, main.legal h2, main.legal h3 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--ink);
+}
+main.legal h1 { font-size: 2rem; }
+main.legal h2 { font-size: 1.35rem; margin-top: 2em; }

@@ -1,18 +1,352 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>AdeptVue</title>
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdeptVue — Coming soon</title>
+  <meta name="description" content="AdeptVue is an educational video app. Learn with short tips and in-depth lessons from real creators. Launching soon on mobile. Join the waitlist.">
+  <link rel="canonical" href="https://adeptvue.com/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="AdeptVue">
+  <meta property="og:title" content="AdeptVue — Coming soon">
+  <meta property="og:description" content="Learn with short tips and in-depth lessons from real creators. Launching soon on mobile.">
+  <meta property="og:url" content="https://adeptvue.com/">
+  <!-- Add a 1200x630 image at /og-image.png when you have one, then uncomment:
+  <meta property="og:image" content="https://adeptvue.com/og-image.png">
+  -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AdeptVue — Coming soon">
+  <meta name="twitter:description" content="Learn with short tips and in-depth lessons from real creators. Launching soon on mobile.">
+  <meta name="theme-color" content="#F4F6F8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0B1220" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="assets/favicon-32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <style>
+    :root {
+      /* Light tokens from adeptvue-app/src/theme/colors.ts LIGHT_THEME */
+      --navy: #0E1A2B;
+      --teal: #0F766E;
+      --bg: #F4F6F8;
+      --bg-card: #FFFFFF;
+      --surface: #FFFFFF;
+      --surface-alt: #EEF2F5;
+      --ink: #0E1A2B;
+      --muted: #475569; /* textSecondary; textMuted #64748B is below AA on --bg */
+      --line: #E5E7EB;
+      --line-strong: #CBD5E1;
+      --accent: #0F766E;
+      --accent-hover: #0C5F59;
+      --teal-soft: #E6F4F3;
+      --action-text: #FFFFFF;
+      --input-border: #D7E0E6;
+      --input-placeholder: #7B8A95;
+      --white: #FFFFFF;
+      --focus: #0F766E;
+      --header-bg: #FFFFFF;
+      --footer-bg: #0E1A2B;
+      --footer-text: #F1F5F9;
+      --footer-link: #9FE1DD;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --shadow: 0 8px 24px rgba(14, 26, 43, 0.08);
+      --radius: 12px; /* Card.tsx */
+      --radius-btn: 8px; /* Button.tsx */
+      --radius-pill: 999px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        /* Dark tokens from colors.ts DARK_THEME. Links use teal #009DA3 (AA); action #0F766E fails AA on #0B1220. */
+        --navy: #0B1C2D;
+        --teal: #009DA3;
+        --bg: #0B1220;
+        --bg-card: #1C2F4D;
+        --surface: #131C2E;
+        --surface-alt: #16273F;
+        --ink: #F1F5F9;
+        --muted: #CBD5E1;
+        --line: #2A3A55;
+        --line-strong: #3F5678;
+        --accent: #009DA3;
+        --accent-hover: #4DB8BC;
+        --teal-soft: #134E4A;
+        --action-text: #FFFFFF;
+        --input-border: #405468;
+        --input-placeholder: #8CA2B0;
+        --white: #1C2F4D;
+        --focus: #009DA3;
+        --header-bg: #131C2E;
+        --footer-bg: #0B1C2D;
+        --footer-text: #F1F5F9;
+        --footer-link: #9FE1DD;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    #waitlist { scroll-margin-top: 88px; }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { transition: none !important; }
+    }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.6;
+      font-size: 1.0625rem;
+    }
+    img { max-width: 100%; height: auto; }
+    a { color: var(--accent); }
+    a:hover { color: var(--accent-hover); }
+    :focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 3px;
+    }
+    .skip {
+      position: absolute;
+      left: 12px;
+      top: -48px;
+      background: var(--ink);
+      color: var(--white);
+      padding: 8px 14px;
+      border-radius: 8px;
+      z-index: 1000;
+      text-decoration: none;
+    }
+    .skip:focus { top: 12px; }
+    .wrap {
+      width: min(1120px, calc(100% - 40px));
+      margin-inline: auto;
+    }
+    header.site {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--header-bg) 92%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      min-height: 68px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .brand:hover { color: var(--ink); }
+    .brand-logo { display: block; width: auto; height: 32px; }
+    .brand-logo-dark { display: none; }
+    @media (prefers-color-scheme: dark) {
+      .brand-logo-light { display: none; }
+      .brand-logo-dark { display: block; }
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 0;
+      border-radius: var(--radius-btn);
+      padding: 12px 20px;
+      font: inherit;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      cursor: pointer;
+      background: var(--navy);
+      color: #FFFFFF;
+    }
+    .btn:hover { background: #0A1422; color: #FFFFFF; }
+    .btn-accent { background: var(--accent); color: var(--action-text); }
+    .btn-accent:hover { background: var(--accent-hover); color: var(--action-text); }
+    .btn-nav { padding: 8px 16px; font-size: 0.92rem; }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 48px;
+      align-items: center;
+      padding: 72px 0 64px;
+    }
+    .eyebrow {
+      display: inline-block;
+      background: var(--teal-soft);
+      color: var(--teal);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 6px 10px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+    h1, h2 { font-family: var(--sans); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin: 0 0 16px; }
+    h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); }
+    h2 { font-size: 1.35rem; margin-bottom: 8px; }
+    .lede {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 38rem;
+      margin: 0 0 28px;
+    }
+    .waitlist {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 28px;
+    }
+    .waitlist h2 { font-size: 1.45rem; margin-bottom: 16px; }
+    .waitlist p { margin: 0 0 18px; color: var(--muted); }
+    .waitlist label { display: block; font-weight: 650; margin-bottom: 6px; font-size: 0.92rem; }
+    .waitlist input[type="email"] {
+      width: 100%;
+      border: 1px solid var(--input-border);
+      border-radius: var(--radius-btn);
+      padding: 12px 14px;
+      font: inherit;
+      background: var(--surface);
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .waitlist input[type="email"]:hover { border-color: var(--line-strong); }
+    .waitlist input::placeholder { color: var(--input-placeholder); }
+    .waitlist .btn { width: 100%; }
+    .form-note { font-size: 0.85rem; color: var(--muted); margin: 12px 0 0; }
+    .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .store-badge {
+      display: inline-flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1 1 130px;
+      min-width: 0;
+      padding: 8px 14px;
+      border: 1.5px solid var(--line-strong);
+      border-radius: var(--radius-btn);
+      color: var(--ink);
+      text-decoration: none;
+      background: var(--surface);
+      line-height: 1.15;
+    }
+    .store-badge small { font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    .store-badge strong { font-size: 0.98rem; }
+    section.band { padding: 24px 0 80px; }
+    .section-kicker {
+      color: var(--teal);
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      margin: 0 0 8px;
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .card p { margin: 0; color: var(--muted); }
+    footer.site {
+      background: var(--footer-bg);
+      color: var(--footer-text);
+      padding: 36px 0 28px;
+    }
+    footer.site a { color: var(--footer-link); }
+    footer.site a:hover { color: #FFFFFF; }
+    footer.site .brand { color: #FFFFFF; margin-bottom: 12px; }
+    footer.site .brand:hover { color: #FFFFFF; }
+    footer.site .brand-logo-light { display: none; }
+    footer.site .brand-logo-dark { display: block; }
+    .footer-meta { margin: 0 0 16px; }
+    .footer-meta a { color: #E8EEF2; text-decoration: none; }
+    .footer-meta a:hover { color: #FFFFFF; text-decoration: underline; }
+    .sep { color: #3F5678; margin: 0 0.6em; }
+    .legal-copy { border-top: 1px solid #2A3A55; padding-top: 18px; margin: 0; font-size: 0.9rem; color: #CBD5E1; }
+    @media (max-width: 860px) {
+      .hero, .grid-2 { grid-template-columns: 1fr; }
+      .hero { padding: 36px 0 40px; gap: 28px; }
+      section.band { padding: 8px 0 56px; }
+    }
+  </style>
 </head>
-<body style="font-family: Arial; text-align:center; padding:60px;">
-  <h1>AdeptVue</h1>
-  <p>Where creators build real value through in-depth content and practical insight.</p>
-  <p>Long-form video, quick tips, and meaningful learning — all in one place.</p>
-  <p><strong>Launching soon on mobile.</strong></p>
-  <br>
-  <p>Contact: hello@adeptvue.com</p>
-  <br>
-  <a href="privacy.html">Privacy Policy</a> |
-  <a href="terms.html">Terms of Service</a>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site">
+    <div class="wrap nav">
+      <a class="brand" href="index.html" aria-label="AdeptVue home">
+        <img class="brand-logo brand-logo-light" src="assets/header-logo-light.png" width="39" height="32" alt="">
+        <img class="brand-logo brand-logo-dark" src="assets/header-logo-dark.png" width="39" height="32" alt="">
+        <span>AdeptVue</span>
+      </a>
+      <a class="btn btn-nav" href="#waitlist">Join the waitlist</a>
+    </div>
+  </header>
+
+  <main id="main">
+    <div class="wrap hero">
+      <div>
+        <p class="eyebrow">Launching soon on mobile</p>
+        <h1>Learn skills that stick.</h1>
+        <p class="lede">Learn with short tips and in-depth lessons from real creators.</p>
+        <p class="lede" style="font-size:1rem;margin-bottom:0;">AdeptVue is an educational video app from AdeptVue, LLC, a Missouri company.</p>
+      </div>
+      <div class="waitlist" id="waitlist">
+        <h2>Get launch updates</h2>
+        <p>Join the waitlist and we’ll email you when the app is ready to download.</p>
+        <!-- Placeholder: replace the form action with your waitlist endpoint when one exists.
+             Until then, submitting opens a pre-filled email to hello@adeptvue.com. No backend is connected. -->
+        <form action="mailto:hello@adeptvue.com?subject=AdeptVue%20waitlist" method="post" enctype="text/plain">
+          <label for="waitlist-email">Email address</label>
+          <input id="waitlist-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+          <button class="btn btn-accent" type="submit">Join the waitlist</button>
+        </form>
+        <p class="form-note">Or email <a href="mailto:hello@adeptvue.com?subject=AdeptVue%20waitlist">hello@adeptvue.com</a> with the subject “Waitlist.”</p>
+        <div class="badges" aria-label="App availability">
+          <div class="store-badge"><small>App Store</small><strong>Coming soon</strong></div>
+          <div class="store-badge"><small>Google Play</small><strong>Coming soon</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <section class="band" aria-label="Who AdeptVue is for">
+      <div class="wrap grid-2">
+        <article class="card">
+          <p class="section-kicker">For learners</p>
+          <h2>Learn from real creators.</h2>
+          <p>Short tips and in-depth lessons you can actually use.</p>
+        </article>
+        <article class="card">
+          <p class="section-kicker">For creators</p>
+          <h2>Share what you know.</h2>
+          <p>Build an audience and earn from subscriptions, tips, and ads.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site">
+    <div class="wrap">
+      <a class="brand" href="index.html" aria-label="AdeptVue home">
+        <img class="brand-logo brand-logo-light" src="assets/header-logo-light.png" width="39" height="32" alt="">
+        <img class="brand-logo brand-logo-dark" src="assets/header-logo-dark.png" width="39" height="32" alt="">
+        <span>AdeptVue</span>
+      </a>
+      <p class="footer-meta">
+        <a href="privacy.html">Privacy Policy</a><span class="sep" aria-hidden="true">·</span><a href="mailto:hello@adeptvue.com">hello@adeptvue.com</a>
+      </p>
+      <p class="legal-copy">© 2026 AdeptVue, LLC. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>
