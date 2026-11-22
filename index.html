@@ -223,6 +223,31 @@
     .waitlist input::placeholder { color: var(--input-placeholder); }
     .waitlist .btn { width: 100%; }
     .form-note { font-size: 0.85rem; color: var(--muted); margin: 12px 0 0; }
+    .waitlist form { position: relative; }
+    .hp {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .waitlist .btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .form-status {
+      font-size: 0.92rem;
+      margin: 12px 0 0;
+      color: var(--muted);
+    }
+    .form-status[data-kind="error"] { color: #B42318; }
+    @media (prefers-color-scheme: dark) {
+      .form-status[data-kind="error"] { color: #FCA5A5; }
+    }
     .badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
     .store-badge {
       display: inline-flex;
@@ -304,14 +329,19 @@
       <div class="waitlist" id="waitlist">
         <h2>Get launch updates</h2>
         <p>Join the waitlist and we’ll email you when the app is ready to download.</p>
-        <!-- Placeholder: replace the form action with your waitlist endpoint when one exists.
-             Until then, submitting opens a pre-filled email to hello@adeptvue.com. No backend is connected. -->
-        <form action="mailto:hello@adeptvue.com?subject=AdeptVue%20waitlist" method="post" enctype="text/plain">
+        <!-- Submits to /api/waitlist via JavaScript when available.
+             The mailto action is kept so the form still works without JavaScript. -->
+        <form id="waitlist-form" action="mailto:hello@adeptvue.com?subject=AdeptVue%20waitlist" method="post" enctype="text/plain">
           <label for="waitlist-email">Email address</label>
-          <input id="waitlist-email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+          <input id="waitlist-email" name="email" type="email" autocomplete="email" required maxlength="254" placeholder="you@example.com">
+          <div class="hp" aria-hidden="true">
+            <label for="waitlist-company">Company</label>
+            <input id="waitlist-company" name="company" type="text" tabindex="-1" autocomplete="off">
+          </div>
           <button class="btn btn-accent" type="submit">Join the waitlist</button>
         </form>
-        <p class="form-note">Or email <a href="mailto:hello@adeptvue.com?subject=AdeptVue%20waitlist">hello@adeptvue.com</a> with the subject “Waitlist.”</p>
+        <p class="form-status" id="waitlist-status" role="status" aria-live="polite" hidden></p>
+        <p class="form-note">Or email <a href="mailto:hello@adeptvue.com?subject=AdeptVue%20waitlist">hello@adeptvue.com</a> with the subject “Waitlist” if the form doesn’t work.</p>
         <div class="badges" aria-label="App availability">
           <div class="store-badge"><small>App Store</small><strong>Coming soon</strong></div>
           <div class="store-badge"><small>Google Play</small><strong>Coming soon</strong></div>
@@ -348,5 +378,70 @@
       <p class="legal-copy">© 2026 AdeptVue, LLC. All rights reserved.</p>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      var form = document.getElementById("waitlist-form");
+      if (!form) return;
+      var emailInput = document.getElementById("waitlist-email");
+      var companyInput = document.getElementById("waitlist-company");
+      var button = form.querySelector('button[type="submit"]');
+      var status = document.getElementById("waitlist-status");
+
+      function showError(message) {
+        if (!status) return;
+        status.hidden = false;
+        status.dataset.kind = "error";
+        status.textContent = message;
+      }
+
+      form.addEventListener("submit", function (event) {
+        event.preventDefault();
+        var email = (emailInput.value || "").trim();
+        var company = companyInput ? companyInput.value : "";
+        if (!email) {
+          showError("Please enter a valid email address.");
+          return;
+        }
+        button.disabled = true;
+        var originalLabel = button.textContent;
+        button.textContent = "Joining…";
+        if (status) {
+          status.hidden = true;
+          status.textContent = "";
+          delete status.dataset.kind;
+        }
+
+        fetch("/api/waitlist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email, company: company })
+        }).then(function (res) {
+          if (res.ok) {
+            var success = document.createElement("div");
+            success.className = "waitlist-success";
+            success.setAttribute("role", "status");
+            success.setAttribute("aria-live", "polite");
+            success.innerHTML = "<h2>You’re on the list</h2><p>Thanks for joining. We’ll email you when AdeptVue is ready to download.</p>";
+            form.replaceWith(success);
+            if (status) status.remove();
+            return;
+          }
+          if (res.status === 400) {
+            showError("Please enter a valid email address.");
+          } else {
+            showError("Something went wrong. You can try again, or email hello@adeptvue.com with the subject “Waitlist.”");
+          }
+          button.disabled = false;
+          button.textContent = originalLabel;
+        }).catch(function () {
+          showError("Something went wrong. You can try again, or email hello@adeptvue.com with the subject “Waitlist.”");
+          button.disabled = false;
+          button.textContent = originalLabel;
+        });
+      });
+    })();
+  </script>
 </body>
+
 </html>
